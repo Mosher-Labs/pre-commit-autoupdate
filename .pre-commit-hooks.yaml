@@ -1,0 +1,11 @@
+---
+- id: autoupdate
+  name: Auto-update pre-commit hooks
+  description: >-
+    Automatically runs pre-commit autoupdate and stages changes to
+    .pre-commit-config.yaml for inclusion in the current commit.
+  entry: hooks/autoupdate.sh
+  language: script
+  pass_filenames: false
+  always_run: true
+  stages: [pre-commit]
