@@ -54,13 +54,14 @@ pre-commit install
 Pass options with `args`. Anything the hook doesn't recognize is passed
 through to `pre-commit autoupdate`.
 
-| Arg | Description |
-| --- | --- |
-| `--freeze` | Pin `rev` to a commit SHA instead of a tag, with the tag kept as a `# frozen: vX.Y.Z` comment |
-| `--interval-hours N` | Skip the check if it last succeeded less than `N` hours ago. Default `0` (check on every commit) |
-| `--jobs N` | Number of repos to check in parallel. Default `8` |
-| `--bleeding-edge` | Update to the latest commit on `HEAD` instead of the latest tag |
-| `--repo URL` | Only update this repo. Can be repeated |
+- `--freeze`: pin `rev` to a commit SHA instead of a tag. The tag is kept
+  as a `# frozen: vX.Y.Z` comment
+- `--interval-hours N`: skip the check if it last succeeded less than `N`
+  hours ago. Default `0` (check on every commit)
+- `--jobs N`: number of repos to check in parallel. Default `8`
+- `--bleeding-edge`: update to the latest commit on `HEAD` instead of the
+  latest tag
+- `--repo URL`: only update this repo. Can be repeated
 
 Pin to SHAs and check at most once a day:
 
