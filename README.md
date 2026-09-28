@@ -1,11 +1,18 @@
 # pre-commit-autoupdate
 
-![GitHub branch status](https://img.shields.io/github/checks-status/mosher-labs/pre-commit-autoupdate/main)
-![GitHub Issues](https://img.shields.io/github/issues/mosher-labs/pre-commit-autoupdate)
-![GitHub last commit](https://img.shields.io/github/last-commit/mosher-labs/pre-commit-autoupdate)
-![GitHub repo size](https://img.shields.io/github/repo-size/mosher-labs/pre-commit-autoupdate)
-![GitHub License](https://img.shields.io/github/license/mosher-labs/pre-commit-autoupdate)
-![GitHub Sponsors](https://img.shields.io/github/sponsors/mosher-labs)
+![GitHub branch status][branch status]
+![GitHub Issues][issues]
+![GitHub last commit][last commit]
+![GitHub repo size][repo size]
+![GitHub License][license]
+![GitHub Sponsors][sponsors]
+
+[branch status]: https://img.shields.io/github/checks-status/mosher-labs/pre-commit-autoupdate/main
+[issues]: https://img.shields.io/github/issues/mosher-labs/pre-commit-autoupdate
+[last commit]: https://img.shields.io/github/last-commit/mosher-labs/pre-commit-autoupdate
+[repo size]: https://img.shields.io/github/repo-size/mosher-labs/pre-commit-autoupdate
+[license]: https://img.shields.io/github/license/mosher-labs/pre-commit-autoupdate
+[sponsors]: https://img.shields.io/github/sponsors/mosher-labs
 
 ## Introduction
 
