@@ -55,9 +55,18 @@ It defines the `autoupdate` hook with these properties:
 
 The main script that:
 
+1. Parses its own args (`--interval-hours`) and passes the rest to
+   `pre-commit autoupdate` (e.g. `--freeze` for SHA pinning)
 1. Checks for `.pre-commit-config.yaml` existence
-1. Runs `pre-commit autoupdate`
+1. Skips if a run with the same args succeeded within `--interval-hours`
+   (stamp file at `$(git rev-parse --git-path pre-commit-autoupdate.stamp)`)
+1. Runs `pre-commit autoupdate --jobs 8` (unless `--jobs` was passed)
 1. Stages the config file if it changed
+
+Speed: autoupdate does one network `git fetch` per repo. Sequential fetches
+were the main cost (~10s for 6 repos); `--jobs 8` cuts that to ~3.5s.
+
+zCore consumes this hook and needs `--freeze` (SHA pins) support.
 
 ## Git Workflow
 
@@ -103,7 +112,7 @@ Breaking changes should bump the major version.
 
 ---
 
-**Last Updated:** 2025-12-26
+**Last Updated:** 2026-09-28
 
 This file should be updated whenever:
 
