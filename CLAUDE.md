@@ -22,11 +22,14 @@ pre-commit-autoupdate/
 ├── .github/workflows/     # CI/CD workflows
 │   ├── pre-commit.yml     # Pre-commit validation
 │   ├── release.yml        # Semantic versioning & releases
-│   └── stale.yml          # Stale issue management
+│   ├── stale.yml          # Stale issue management
+│   └── test.yml           # tests/run.sh on Ubuntu and macOS
 ├── .pre-commit-config.yaml  # This repo's own pre-commit config
 ├── .pre-commit-hooks.yaml   # Hook definitions for consumers
 ├── hooks/
 │   └── autoupdate.sh      # The autoupdate script
+├── tests/
+│   └── run.sh             # Hook tests (local repos, no network)
 ├── README.md
 ├── CLAUDE.md
 └── LICENSE
@@ -55,13 +58,22 @@ It defines the `autoupdate` hook with these properties:
 
 The main script that:
 
-1. Parses its own args (`--interval-hours`) and passes the rest to
-   `pre-commit autoupdate` (e.g. `--freeze` for SHA pinning)
+1. Parses its own args (`--interval-hours`, `--min-age-days`,
+   `--fail-on-update`) and passes the rest to `pre-commit autoupdate`
+   (e.g. `--freeze` for SHA pinning)
 1. Checks for `.pre-commit-config.yaml` existence
 1. Skips if a run with the same args succeeded within `--interval-hours`
    (stamp file at `$(git rev-parse --git-path pre-commit-autoupdate.stamp)`)
 1. Runs `pre-commit autoupdate --jobs 8` (unless `--jobs` was passed)
-1. Stages the config file if it changed
+1. With `--min-age-days`, restores the old `rev` line for each repo whose new
+   tag's GitHub release is too young, missing, or whose frozen tag moved.
+   autoupdate rewrites `rev` lines in place, so line N before matches line N
+   after. The repo for a `rev` line is the `repo:` in the same list entry,
+   in any key order
+1. Stages the config file if it changed, or exits 1 with `--fail-on-update`
+
+Release age comes from GitHub's `published_at`. Git dates can be backdated,
+so the hook doesn't read them. Anything unknown holds the bump.
 
 Speed: autoupdate does one network `git fetch` per repo. Sequential fetches
 were the main cost (~10s for 6 repos); `--jobs 8` cuts that to ~3.5s.
@@ -88,11 +100,12 @@ zCore consumes this hook and needs `--freeze` (SHA pins) support.
 
 ### Testing Changes
 
-To test changes to the hook:
-
-1. Make changes to `hooks/autoupdate.sh`
-1. In a test repo, point to your branch (see example in README)
-1. Run `pre-commit run autoupdate` to test
+Run `tests/run.sh`. It builds local hook repos with real tags and serves
+release dates from fixture files through `PCA_GITHUB_API=file://...`, so it
+needs no network. CI (`.github/workflows/test.yml`) runs it on Ubuntu and on
+macOS's `/bin/bash` 3.2, so keep the hook bash 3.2 compatible: no `mapfile`,
+no associative arrays, and `${arr[@]+"${arr[@]}"}` for arrays that may be
+empty under `set -u`.
 
 ### Versioning
 
