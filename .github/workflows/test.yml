@@ -1,0 +1,30 @@
+---
+# Runs tests/run.sh on Linux and on macOS's /bin/bash (3.2).
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pre-commit
+        run: pipx install pre-commit
+
+      - name: Run tests
+        env:
+          BASH_BIN: /bin/bash
+        run: tests/run.sh

@@ -63,12 +63,17 @@ through to `pre-commit autoupdate`.
 
 - `--freeze`: pin `rev` to a commit SHA instead of a tag. The tag is kept
   as a `# frozen: vX.Y.Z` comment
-- `--interval-hours N`: skip the check if it last succeeded less than `N`
-  hours ago. Default `0` (check on every commit)
+- `--interval-hours N`: skip the check if it ran less than `N` hours ago.
+  Default `0` (check on every commit)
 - `--jobs N`: number of repos to check in parallel. Default `8`
 - `--bleeding-edge`: update to the latest commit on `HEAD` instead of the
   latest tag
 - `--repo URL`: only update this repo. Can be repeated
+- `--min-age-days N`: keep a hook on its current rev until the GitHub release
+  for its new tag is at least `N` days old. See
+  [Minimum release age](#minimum-release-age)
+- `--fail-on-update`: fail the commit when a rev is bumped, and leave the
+  bump unstaged so you can review it and commit it on its own
 
 Pin to SHAs and check at most once a day:
 
@@ -79,6 +84,41 @@ Pin to SHAs and check at most once a day:
       - id: autoupdate
         args: [--freeze, --interval-hours, "24"]
 ```
+
+Take only releases at least a week old, and review each bump:
+
+```yaml
+      - id: autoupdate
+        args: [--freeze, --min-age-days, "7", --fail-on-update]
+```
+
+### Minimum release age
+
+A new release can be compromised. `--min-age-days` gives the ecosystem time to
+catch and pull a bad one before you adopt it. After `pre-commit autoupdate`
+runs, the hook looks up the GitHub release for each bumped repo's new tag and
+restores the old `rev` line if the release is too new.
+
+The age comes from the release's `published_at`, which GitHub sets. Git tag
+and commit dates are set by whoever made them, so the hook doesn't use them.
+A bump is held when:
+
+- the tag has no GitHub release, or the repo isn't on GitHub
+- the API request fails, e.g. when rate limited. The next commit retries,
+  even with `--interval-hours`
+- with `--freeze`, a tag now points to a different commit. A release's date
+  says nothing about which commit its tag points to, so a moved tag is always
+  held
+
+Bump those by hand. `--min-age-days` can't be combined with `--bleeding-edge`,
+whose revs have no tag.
+
+github.com repos use `https://api.github.com`. Set `PCA_GITHUB_API` to look up
+all other repos elsewhere, such as GitHub Enterprise
+(`https://github.example.com/api/v3`). The hook sends `GITHUB_TOKEN` or
+`GH_TOKEN` to an `https` API when set, which raises the rate limit. pre-commit
+hides a passing hook's output, so run `pre-commit run autoupdate --verbose` to
+see which bumps were held.
 
 ### Performance
 
@@ -110,4 +150,12 @@ To run pre-commit hooks locally without a git commit:
 
 ```bash
 pre-commit run -a --all-files
+```
+
+Run the tests (needs git and pre-commit). CI runs them on Linux and on macOS's
+`/bin/bash`:
+
+```bash
+tests/run.sh
+BASH_BIN=/bin/bash tests/run.sh   # test another bash
 ```
