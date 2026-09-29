@@ -1,11 +1,18 @@
 # pre-commit-autoupdate
 
-![GitHub branch status](https://img.shields.io/github/checks-status/mosher-labs/pre-commit-autoupdate/main)
-![GitHub Issues](https://img.shields.io/github/issues/mosher-labs/pre-commit-autoupdate)
-![GitHub last commit](https://img.shields.io/github/last-commit/mosher-labs/pre-commit-autoupdate)
-![GitHub repo size](https://img.shields.io/github/repo-size/mosher-labs/pre-commit-autoupdate)
-![GitHub License](https://img.shields.io/github/license/mosher-labs/pre-commit-autoupdate)
-![GitHub Sponsors](https://img.shields.io/github/sponsors/mosher-labs)
+![GitHub branch status][branch status]
+![GitHub Issues][issues]
+![GitHub last commit][last commit]
+![GitHub repo size][repo size]
+![GitHub License][license]
+![GitHub Sponsors][sponsors]
+
+[branch status]: https://img.shields.io/github/checks-status/mosher-labs/pre-commit-autoupdate/main
+[issues]: https://img.shields.io/github/issues/mosher-labs/pre-commit-autoupdate
+[last commit]: https://img.shields.io/github/last-commit/mosher-labs/pre-commit-autoupdate
+[repo size]: https://img.shields.io/github/repo-size/mosher-labs/pre-commit-autoupdate
+[license]: https://img.shields.io/github/license/mosher-labs/pre-commit-autoupdate
+[sponsors]: https://img.shields.io/github/sponsors/mosher-labs
 
 ## Introduction
 
@@ -19,6 +26,8 @@ to `.pre-commit-config.yaml` so they're included in your commit.
 - Stages updated `.pre-commit-config.yaml` for inclusion in the current commit
 - Works silently when no updates are available
 - Zero configuration required
+- Optional pinning to commit SHAs (`--freeze`)
+- Optional throttling so the network check doesn't run on every commit
 
 ### How It Works
 
@@ -46,6 +55,38 @@ Then install the hooks:
 ```bash
 pre-commit install
 ```
+
+### Options
+
+Pass options with `args`. Anything the hook doesn't recognize is passed
+through to `pre-commit autoupdate`.
+
+- `--freeze`: pin `rev` to a commit SHA instead of a tag. The tag is kept
+  as a `# frozen: vX.Y.Z` comment
+- `--interval-hours N`: skip the check if it last succeeded less than `N`
+  hours ago. Default `0` (check on every commit)
+- `--jobs N`: number of repos to check in parallel. Default `8`
+- `--bleeding-edge`: update to the latest commit on `HEAD` instead of the
+  latest tag
+- `--repo URL`: only update this repo. Can be repeated
+
+Pin to SHAs and check at most once a day:
+
+```yaml
+  - repo: https://github.com/mosher-labs/pre-commit-autoupdate
+    rev: v1.0.0
+    hooks:
+      - id: autoupdate
+        args: [--freeze, --interval-hours, "24"]
+```
+
+### Performance
+
+`pre-commit autoupdate` fetches every repo in your config over the network,
+so its cost grows with the number of repos. The hook fetches up to 8 repos in
+parallel. For the fastest commits, set `--interval-hours` so most commits skip
+the check entirely. The last run time is stored in
+`.git/pre-commit-autoupdate.stamp`. Delete it to force a check.
 
 ### Requirements
 
