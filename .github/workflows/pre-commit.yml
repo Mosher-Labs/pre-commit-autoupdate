@@ -9,4 +9,4 @@ permissions: read-all
 
 jobs:
   pre-commit:
-    uses: "Mosher-Labs/.github/.github/workflows/pre-commit.yml@76e8800f3493921a1eeaf89e26dd97ce064f990d" # v0.10.34
+    uses: "Mosher-Labs/.github/.github/workflows/pre-commit.yml@541b3d3c9182820bec7f027fb9c61a5c17974ed8" # v0.10.35
