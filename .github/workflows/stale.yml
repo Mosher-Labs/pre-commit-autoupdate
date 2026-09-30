@@ -9,4 +9,4 @@ permissions:
 
 jobs:
   pre-commit:
-    uses: "Mosher-Labs/.github/.github/workflows/stale.yml@541b3d3c9182820bec7f027fb9c61a5c17974ed8" # v0.10.35
+    uses: "Mosher-Labs/.github/.github/workflows/stale.yml@959e22a07499324e8f241f57678172b35f12a9d4" # v0.10.36
